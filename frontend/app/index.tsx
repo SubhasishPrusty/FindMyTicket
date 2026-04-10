@@ -180,11 +180,8 @@ const styles = StyleSheet.create({
     marginTop: -24,
     borderRadius: 24,
     padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
     elevation: 4,
+    ...({ boxShadow: '0px 4px 12px rgba(0,0,0,0.08)' } as any),
   },
   formTitle: {
     fontSize: 22,

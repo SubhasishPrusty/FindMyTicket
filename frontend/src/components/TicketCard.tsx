@@ -121,11 +121,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
     elevation: 3,
+    ...({ boxShadow: '0px 2px 8px rgba(0,0,0,0.06)' } as any),
   },
   topRow: {
     flexDirection: 'row',
