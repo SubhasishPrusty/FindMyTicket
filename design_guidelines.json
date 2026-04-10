@@ -1,0 +1,126 @@
+{
+  "theme": "Light",
+  "archetype": "4 (Swiss & High-Contrast) - Modified for Aviation Minimal",
+  "design_philosophy": "A clean, functional, high-contrast mobile interface that prioritizes legibility and quick access to critical flight information. It uses the 'Swiss' archetype to eliminate clutter. Generous white space, sharp typography, and structural grid borders define the experience. Mobile-first ergonomics with large tap targets.",
+  "colors": {
+    "background": {
+      "primary": "#F8F9FA",
+      "secondary": "#FFFFFF",
+      "tertiary": "#F1F5F9"
+    },
+    "text": {
+      "primary": "#0A192F",
+      "secondary": "#475569",
+      "tertiary": "#94A3B8"
+    },
+    "brand": {
+      "primary": "#0055FF",
+      "primary_hover": "#0044CC",
+      "accent": "#FF3B30",
+      "success": "#10B981",
+      "warning": "#F59E0B"
+    },
+    "border": {
+      "default": "#E2E8F0",
+      "focus": "#0055FF"
+    }
+  },
+  "typography": {
+    "font_families": {
+      "heading": "Outfit, Cabinet Grotesk, or System Default Heavy",
+      "body": "System Default Regular",
+      "mono": "Space Mono, Courier"
+    },
+    "sizes": {
+      "h1": "text-4xl sm:text-5xl tracking-tighter font-black text-[#0A192F]",
+      "h2": "text-2xl sm:text-3xl tracking-tight font-bold text-[#0A192F]",
+      "h3": "text-xl font-bold tracking-tight text-[#0A192F]",
+      "body": "text-base font-normal leading-relaxed text-[#475569]",
+      "small": "text-xs text-[#94A3B8] font-bold uppercase tracking-[0.2em]",
+      "pnr": "text-2xl font-mono font-bold tracking-widest text-[#0055FF]"
+    }
+  },
+  "spacing_and_layout": {
+    "app_padding": "px-6",
+    "card_padding": "p-6",
+    "gap_large": "gap-8",
+    "gap_medium": "gap-4",
+    "gap_small": "gap-2",
+    "border_radius": {
+      "card": "rounded-3xl",
+      "button": "rounded-full",
+      "input": "rounded-xl"
+    }
+  },
+  "components": {
+    "ticket_card": {
+      "surface": "bg-white border border-[#E2E8F0] shadow-sm rounded-3xl p-6",
+      "layout": "Flex column. Top row: Airline & Date. Middle: Massive Origin/Dest codes (e.g. JFK -> LHR) with plane icon. Bottom: Monospace PNR and Truncated Passenger Names.",
+      "special_styling": "Use a dashed horizontal border (border-dashed border-gray-200) to separate the PNR section, mimicking a physical boarding pass cutout."
+    },
+    "buttons": {
+      "primary": "bg-[#0055FF] rounded-full h-14 flex items-center justify-center active:opacity-80",
+      "primary_text": "text-white font-bold text-lg",
+      "secondary": "bg-white border border-[#E2E8F0] rounded-full h-14 flex items-center justify-center active:bg-gray-50",
+      "secondary_text": "text-[#0A192F] font-bold text-lg",
+      "ghost": "bg-transparent active:opacity-70",
+      "ghost_text": "text-[#0055FF] font-bold"
+    },
+    "inputs": {
+      "default": "h-14 bg-white border border-[#E2E8F0] rounded-xl px-4 text-base text-[#0A192F] focus:border-[#0055FF] focus:border-2"
+    },
+    "bottom_sheet_modal": {
+      "surface": "bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] p-6"
+    }
+  },
+  "screens": {
+    "LoginScreen": {
+      "layout": "Hero image at the top (30% height), white bottom sheet containing Phone Input, 6-digit PIN input, Primary Login Button, and Google OAuth button.",
+      "visuals": "Use login_hero image. Google button should use official colors or secondary ghost style."
+    },
+    "DashboardScreen": {
+      "layout": "Large header 'My Tickets', followed by a vertical ScrollView of TicketCards. FAB (Floating Action Button) at bottom right for 'Add Ticket'. Header should have profile/settings icon."
+    },
+    "TicketDetailScreen": {
+      "layout": "Scrollable view. Large ticket component taking up most of the screen. Action grid below the ticket.",
+      "ticket_ui": "Airline, Flight Number, Date, Origin/Dest with times, Gate info, PNR, Full Passenger List, Barcode placeholder.",
+      "actions": "Grid layout (cols-2). Buttons: Download, Share, Remind, Check-in."
+    },
+    "AddTicketModal": {
+      "layout": "Bottom sheet or modal. Two large touch targets: 'Upload PDF/Image' and 'Enter Manually'. Followed by a form if manual is selected."
+    },
+    "FlightStatusScreen": {
+      "layout": "Search by Flight Number -> Results showing real-time timeline (AviationStack API). Use green for 'On Time', orange for 'Delayed'."
+    }
+  },
+  "media": {
+    "login_hero": {
+      "url": "https://images.unsplash.com/photo-1567105640309-97c801060c9c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1NzZ8MHwxfHNlYXJjaHwxfHxwbGFuZSUyMHdpbmRvdyUyMHNreSUyMG1pbmltYWx8ZW58MHx8fHwxNzc1Nzg4Mjg0fDA&ixlib=rb-4.1.0&q=85",
+      "usage": "Background or header image for the Login screen to establish the aviation theme."
+    },
+    "empty_state_graphic": {
+      "url": "https://images.unsplash.com/photo-1557668321-4ed709a47b13?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwyfHxhaXJwb3J0JTIwdGVybWluYWwlMjB3aW5kb3clMjBtaW5pbWFsfGVufDB8fHx8MTc3NTc4ODI3NHww&ixlib=rb-4.1.0&q=85",
+      "usage": "Subtle background for empty state when no tickets are found. Add a slight white overlay (opacity) so text is legible."
+    }
+  },
+  "icons": {
+    "library": "lucide-react-native",
+    "usage": "Use stroke-width 2. Keep icons simple and consistent. Essential icons: Plane, Ticket, Share, Download, Bell (Reminder), Globe (Web Check-in), Plus (Add)."
+  },
+  "testing": {
+    "rules": [
+      "All interactive elements MUST have a testID or data-testid property.",
+      "Use kebab-case for test IDs. Example: testID='login-submit-button'",
+      "Ticket cards must have unique test IDs like testID='ticket-card-{pnr}'"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "This is a React Native Expo application. Ensure you are using React Native components (View, Text, TouchableOpacity, ScrollView) and not web DOM elements (div, span).",
+    "For styling, you can use NativeWind (Tailwind for React Native) or standard StyleSheet. The guidelines provide Tailwind classes which translate directly to NativeWind.",
+    "Do not use generic sans-serif for massive headers. Emphasize weight and tight tracking for typography to match the 'Swiss High-Contrast' archetype.",
+    "Ticket Cards must have high contrast and generous padding (p-6). Don't cramp the text.",
+    "Implement the AviationStack API check cleanly with colored status indicators (Green=On Time, Red=Delayed, Gray=Scheduled).",
+    "For Google OAuth and Gmail integration, mock the deep native integrations if credentials aren't provided, but build out the UI fully.",
+    "The FAB for adding tickets should be prominent and accessible."
+  ]
+}
