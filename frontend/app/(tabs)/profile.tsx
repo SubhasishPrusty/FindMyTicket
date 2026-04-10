@@ -1,24 +1,24 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../src/context/AuthContext';
 import { COLORS } from '../../src/constants/theme';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const [loggingOut, setLoggingOut] = useState(false);
 
   async function handleLogout() {
-    const isWeb = typeof document !== 'undefined';
-    if (isWeb) {
-      if (window.confirm('Are you sure you want to logout?')) {
-        await logout();
-        window.location.href = '/';
-      }
-    } else {
-      Alert.alert('Logout', 'Are you sure you want to logout?', [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', style: 'destructive', onPress: () => logout() },
-      ]);
+    setLoggingOut(true);
+    try {
+      await AsyncStorage.removeItem('auth_token');
+      try { await logout(); } catch {}
+    } catch {}
+    // Hard redirect works on both web preview and Expo Go web
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
     }
   }
 
