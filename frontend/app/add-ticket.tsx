@@ -21,6 +21,24 @@ const emptyForm = {
   booking_class: 'Economy', passenger_name: '',
 };
 
+async function readFileAsBase64(uri: string): Promise<string> {
+  if (Platform.OS === 'web') {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        const base64 = dataUrl.split(',')[1] || '';
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+  return FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+}
+
 export default function AddTicketScreen() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('choose');
@@ -49,7 +67,11 @@ export default function AddTicketScreen() {
 
   async function pickFromCamera() {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
-    if (!perm.granted) { Alert.alert('Permission needed', 'Camera access is required'); return; }
+    if (!perm.granted) {
+      if (Platform.OS === 'web') { window.alert('Camera access is required'); }
+      else { Alert.alert('Permission needed', 'Camera access is required'); }
+      return;
+    }
     const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8 });
     if (!result.canceled && result.assets[0]) {
       await parseImage(result.assets[0].uri, 'image/jpeg');
@@ -58,19 +80,27 @@ export default function AddTicketScreen() {
 
   async function pickFromGallery() {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) { Alert.alert('Permission needed', 'Photo library access is required'); return; }
+    if (!perm.granted) {
+      if (Platform.OS === 'web') { window.alert('Photo library access is required'); }
+      else { Alert.alert('Permission needed', 'Photo library access is required'); }
+      return;
+    }
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 });
     if (!result.canceled && result.assets[0]) {
-      await parseImage(result.assets[0].uri, 'image/jpeg');
+      await parseImage(result.assets[0].uri, result.assets[0].mimeType || 'image/jpeg');
     }
   }
 
   async function pickDocument() {
-    const result = await DocumentPicker.getDocumentAsync({ type: ['image/*', 'application/pdf'] });
-    if (!result.canceled && result.assets?.[0]) {
-      const asset = result.assets[0];
-      const mime = asset.mimeType || 'image/jpeg';
-      await parseImage(asset.uri, mime);
+    try {
+      const result = await DocumentPicker.getDocumentAsync({ type: ['image/*', 'application/pdf'] });
+      if (!result.canceled && result.assets?.[0]) {
+        const asset = result.assets[0];
+        const mime = asset.mimeType || 'application/pdf';
+        await parseImage(asset.uri, mime);
+      }
+    } catch (e: any) {
+      setError('Failed to pick document: ' + (e.message || 'Unknown error'));
     }
   }
 
@@ -79,7 +109,7 @@ export default function AddTicketScreen() {
     setMode('parsing');
     setError('');
     try {
-      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+      const base64 = await readFileAsBase64(uri);
       const data = await apiCall('/api/tickets/parse', {
         method: 'POST',
         body: JSON.stringify({ image_base64: base64, mime_type: mimeType }),

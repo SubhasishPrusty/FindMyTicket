@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Share, Alert, Linking,
+  ActivityIndicator, Share, Alert, Linking, Platform,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -41,7 +41,8 @@ export default function TicketDetailScreen() {
       const data = await apiCall(`/api/tickets/${id}`);
       setTicket(data.ticket);
     } catch (e: any) {
-      Alert.alert('Error', e.message || 'Failed to load ticket');
+      if (Platform.OS === 'web') { window.alert(e.message || 'Failed to load ticket'); }
+      else { Alert.alert('Error', e.message || 'Failed to load ticket'); }
       router.back();
     } finally {
       setLoading(false);
@@ -64,20 +65,26 @@ export default function TicketDetailScreen() {
   }
 
   async function handleDelete() {
-    Alert.alert('Delete Ticket', 'Are you sure you want to delete this ticket?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete', style: 'destructive',
-        onPress: async () => {
-          try {
-            await apiCall(`/api/tickets/${id}`, { method: 'DELETE' });
-            router.back();
-          } catch (e: any) {
-            Alert.alert('Error', e.message || 'Failed to delete');
-          }
-        },
-      },
-    ]);
+    const doDelete = async () => {
+      try {
+        await apiCall(`/api/tickets/${id}`, { method: 'DELETE' });
+        router.back();
+      } catch (e: any) {
+        if (Platform.OS === 'web') { window.alert(e.message || 'Failed to delete'); }
+        else { Alert.alert('Error', e.message || 'Failed to delete'); }
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && window.confirm('Are you sure you want to delete this ticket?')) {
+        await doDelete();
+      }
+    } else {
+      Alert.alert('Delete Ticket', 'Are you sure you want to delete this ticket?', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: doDelete },
+      ]);
+    }
   }
 
   if (loading) {
