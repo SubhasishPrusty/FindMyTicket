@@ -1,0 +1,10 @@
+Build a mobile app to track my flight tickets. 
+Problem: I travel by flight a lot. I also sometimes book tickets for my family or friends. Due to this , my inbox gets messy and i cant find the required ticket at the right time.
+Solution: An App which will scan my email inbox and extract the flight tickets and showcase it like small cards with basic information such as origin , destination , date , pnr, traveller name (in case multiple people in the ticket then show upto 3 names and then write +n . When i click on any of the cards , it will show the all the information about the ticket , all the names in that pnr , an option to download the ticket/boarding pass , reminder and button to redirect to webcheckin . 
+It should also have a share button which would share an customized image of the card(with relevant information ) of the ticket and not the whole ticket given by the airlines. The image should look minimal and similar to how i view the ticket details in the app. Along with this , a messsage should also go like " I am using xyz app to track my flight ticket. Click on this link and you can do it too." And add a referal link to it. 
+
+Additional Optional features: 
+1. Option to check the flight status using an external API of third party flight tracker . If its cancelled or delayed etc. 
+
+The design of the app should be minimal. the layout should be clear and professional but should be contain all relevant information. It should have a login functionality. Just phone number and 6 digit pin for now. Later I will integrate a otp functionality for first time login. 
+Name : Find my tickets.
