@@ -267,15 +267,17 @@ async def parse_ticket(data: ParseTicketRequest, user: dict = Depends(get_curren
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
         
+        is_pdf = data.mime_type and 'pdf' in data.mime_type.lower()
+        
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"parse_{uuid.uuid4().hex[:8]}",
-            system_message="""You are a flight ticket information extractor. Extract flight details from the provided ticket image.
+            system_message="""You are a flight ticket information extractor. Extract flight details from the provided ticket.
 Return ONLY a valid JSON object with these exact fields (use empty string "" if a field is not found):
 {
     "pnr": "booking reference/PNR code",
     "airline": "airline name",
-    "flight_number": "flight number e.g. AI302",
+    "flight_number": "flight number e.g. AI302 or 6E702",
     "origin_code": "3-letter IATA origin airport code",
     "origin_city": "origin city name",
     "destination_code": "3-letter IATA destination airport code",
@@ -294,11 +296,32 @@ Return ONLY the JSON. No markdown, no explanation, no code blocks."""
         )
         chat.with_model("openai", "gpt-5.2")
         
-        image_content = ImageContent(image_base64=data.image_base64)
-        user_message = UserMessage(
-            text="Extract all flight information from this ticket. Return only the JSON object.",
-            file_contents=[image_content]
-        )
+        if is_pdf:
+            import pdfplumber
+            import io
+            import base64 as b64module
+            
+            pdf_bytes = b64module.b64decode(data.image_base64)
+            pdf_text = ""
+            with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+                for page in pdf.pages:
+                    page_text = page.extract_text()
+                    if page_text:
+                        pdf_text += page_text + "\n"
+            
+            if not pdf_text.strip():
+                raise HTTPException(status_code=400, detail="Could not extract text from PDF. Try uploading a screenshot instead.")
+            
+            logger.info(f"Extracted {len(pdf_text)} chars from PDF")
+            user_message = UserMessage(
+                text=f"Extract all flight information from this ticket text and return only the JSON object:\n\n{pdf_text[:8000]}"
+            )
+        else:
+            image_content = ImageContent(image_base64=data.image_base64)
+            user_message = UserMessage(
+                text="Extract all flight information from this ticket image. Return only the JSON object.",
+                file_contents=[image_content]
+            )
         
         response = await chat.send_message(user_message)
         
@@ -319,6 +342,8 @@ Return ONLY the JSON. No markdown, no explanation, no code blocks."""
     except json.JSONDecodeError:
         logger.error(f"Failed to parse AI response as JSON")
         raise HTTPException(status_code=500, detail="Failed to parse ticket. Please try again or enter manually.")
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"AI parsing error: {e}")
         raise HTTPException(status_code=500, detail=f"Parsing failed: {str(e)}")

@@ -22,7 +22,8 @@ const emptyForm = {
 };
 
 async function readFileAsBase64(uri: string): Promise<string> {
-  if (Platform.OS === 'web') {
+  const isWeb = typeof document !== 'undefined';
+  if (isWeb) {
     const response = await fetch(uri);
     const blob = await response.blob();
     return new Promise<string>((resolve, reject) => {
@@ -66,9 +67,10 @@ export default function AddTicketScreen() {
   }
 
   async function pickFromCamera() {
+    const isWeb = typeof document !== 'undefined';
     const perm = await ImagePicker.requestCameraPermissionsAsync();
     if (!perm.granted) {
-      if (Platform.OS === 'web') { window.alert('Camera access is required'); }
+      if (isWeb) { window.alert('Camera access is required'); }
       else { Alert.alert('Permission needed', 'Camera access is required'); }
       return;
     }
@@ -79,9 +81,10 @@ export default function AddTicketScreen() {
   }
 
   async function pickFromGallery() {
+    const isWeb = typeof document !== 'undefined';
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
-      if (Platform.OS === 'web') { window.alert('Photo library access is required'); }
+      if (isWeb) { window.alert('Photo library access is required'); }
       else { Alert.alert('Permission needed', 'Photo library access is required'); }
       return;
     }

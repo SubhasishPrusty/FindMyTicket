@@ -8,9 +8,11 @@ export default function ProfileScreen() {
   const { user, logout } = useAuth();
 
   async function handleLogout() {
-    if (Platform.OS === 'web') {
-      if (typeof window !== 'undefined' && window.confirm('Are you sure you want to logout?')) {
+    const isWeb = typeof document !== 'undefined';
+    if (isWeb) {
+      if (window.confirm('Are you sure you want to logout?')) {
         await logout();
+        window.location.href = '/';
       }
     } else {
       Alert.alert('Logout', 'Are you sure you want to logout?', [

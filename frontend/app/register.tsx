@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TextInput, TouchableOpacity,
   KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from 'react-native';
-import { useRouter, Redirect } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../src/context/AuthContext';
@@ -19,16 +19,18 @@ export default function RegisterScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace('/(tabs)');
+    }
+  }, [loading, user]);
+
+  if (loading || user) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLORS.brand.primary} />
       </View>
     );
-  }
-
-  if (user) {
-    return <Redirect href="/(tabs)" />;
   }
 
   async function handleRegister() {

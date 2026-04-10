@@ -65,18 +65,19 @@ export default function TicketDetailScreen() {
   }
 
   async function handleDelete() {
+    const isWeb = typeof document !== 'undefined';
     const doDelete = async () => {
       try {
         await apiCall(`/api/tickets/${id}`, { method: 'DELETE' });
         router.back();
       } catch (e: any) {
-        if (Platform.OS === 'web') { window.alert(e.message || 'Failed to delete'); }
+        if (isWeb) { window.alert(e.message || 'Failed to delete'); }
         else { Alert.alert('Error', e.message || 'Failed to delete'); }
       }
     };
 
-    if (Platform.OS === 'web') {
-      if (typeof window !== 'undefined' && window.confirm('Are you sure you want to delete this ticket?')) {
+    if (isWeb) {
+      if (window.confirm('Are you sure you want to delete this ticket?')) {
         await doDelete();
       }
     } else {
